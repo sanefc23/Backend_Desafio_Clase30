@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js --port=8080",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/server.js --runMode=CLUSTER --port=8080",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prod": "forever start -w src/server.js --runMode=CLUSTER --port=8080",
+    "pm2": "pm2 start server-pm2.json --watch -i max"
   },
   "engines": {
     "node": ">=14.0.0",
@@ -16,6 +18,8 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "child_process": "^1.0.2",
+    "cluster": "^0.7.7",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^4.6.0",
     "cookie-parser": "^1.4.6",
@@ -23,6 +27,7 @@
     "express": "^4.17.3",
     "express-handlebars": "^6.0.5",
     "express-session": "^1.17.3",
+    "forever": "^4.0.3",
     "knex": "^2.0.0",
     "minimist": "^1.2.6",
     "mongoose": "^6.3.4",
