@@ -20,6 +20,7 @@ passport.use('login', new LocalStrategy({
         passReqToCallback: true
     },
     function (req, userName, password, done) {
+        logger.info(req.route);
         User.findOne({
                 email: userName
             },
@@ -43,13 +44,15 @@ passport.use('login', new LocalStrategy({
 ));
 
 passport.use('register', new LocalStrategy({
-    usernameField: 'email',
-    passwordField: 'password',
-    passReqToCallback: true
-},
-    function (req, email
-        , password, done) {
-        User.findOne({ email: email },
+        usernameField: 'email',
+        passwordField: 'password',
+        passReqToCallback: true
+    },
+    function (req, email, password, done) {
+        logger.info(req.route);
+        User.findOne({
+                email: email
+            },
             (err, user) => {
                 if (err) {
                     req.flash('Register error: ', err);
@@ -77,15 +80,27 @@ passport.use('register', new LocalStrategy({
 
 const userController = {
     failedLogin: (req, res) => {
-        res.render('index', { failedLogin: true, message: message })
+        logger.info(req.route);
+        res.render('index', {
+            failedLogin: true,
+            message: message
+        })
     },
     registerView: (req, res) => {
-        res.render('index', { registerView: true })
+        logger.info(req.route);
+        res.render('index', {
+            registerView: true
+        })
     },
     failedRegister: (req, res) => {
-        res.render('index', { failedLogin: true, message: message })
+        logger.info(req.route);
+        res.render('index', {
+            failedLogin: true,
+            message: message
+        })
     },
     logout: (req, res) => {
+        logger.info(req.route);
         req.session.destroy()
         res.redirect('/');
     }

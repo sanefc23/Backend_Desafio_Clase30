@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js --runMode=CLUSTER --port=8080",
+    "dev": "nodemon src/server.js --runMode=FORK --port=8080",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prod": "forever start -w src/server.js --runMode=CLUSTER --port=8080",
     "pm2": "pm2 start ecosystem.config.js"
@@ -17,9 +17,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "artillery": "^2.0.0-19",
     "bcrypt": "^5.0.1",
     "child_process": "^1.0.2",
     "cluster": "^0.7.7",
+    "compression": "^1.7.4",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^4.6.0",
     "cookie-parser": "^1.4.6",
@@ -28,7 +30,9 @@
     "express-handlebars": "^6.0.5",
     "express-session": "^1.17.3",
     "forever": "^4.0.3",
+    "http-errors": "^2.0.0",
     "knex": "^2.0.0",
+    "log4js": "^6.5.2",
     "minimist": "^1.2.6",
     "mongoose": "^6.3.4",
     "mongoose-type-email": "^1.1.2",

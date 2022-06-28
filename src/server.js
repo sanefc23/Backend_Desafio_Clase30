@@ -9,7 +9,6 @@ const PATH = require('path')
 const app = express();
 const server = require("http").Server(app);
 const io = require("socket.io")(server);
-
 const denv = require('dotenv');
 const dotenv = denv.config();
 const productRouter = require("./routers/productRouter");
@@ -18,8 +17,10 @@ const mongoose = require("mongoose");
 const MongoStore = require("connect-mongo")
 const passport = require('passport');
 const flash = require('connect-flash');
+const compression = require('compression');
 const args = require('minimist')(process.argv);
 const PORT = args.port || 8080;
+const log4js = require('log4js');
 const {
     fork
 } = require("child_process");
@@ -32,6 +33,32 @@ const Product = require("./db/Product");
 const {
     faker
 } = require('@faker-js/faker');
+
+log4js.configure({
+    appenders: {
+        warnings: {
+            type: "file",
+            filename: "warn.log",
+            level: 'warn'
+        },
+        all: {
+            type: "console"
+        },
+    },
+    categories: {
+        file1: {
+            appenders: ["warnings"],
+            level: "warn"
+        },
+        default: {
+            appenders: ["all"],
+            level: "trace"
+        }
+    }
+});
+
+const logger = log4js.getLogger();
+const loggerWarn = log4js.getLogger('file1');
 
 // --- Normalizr ---
 const normalizr = require('normalizr');
@@ -56,6 +83,7 @@ app.use(express.urlencoded({
 app.use(express.static("./public"));
 app.use(cookieParser());
 app.use(flash());
+app.use(compression());
 
 if (args.runMode == 'CLUSTER') {
     if (cluster.isPrimary) {
@@ -111,6 +139,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/info', (req, res) => {
+    logger.info(req.route);
     res.json({
         argsEntrada: process.argv,
         sistOperativo: process.platform,
@@ -124,12 +153,17 @@ app.get('/info', (req, res) => {
 })
 
 app.get('/randoms/:num?', (req, res) => {
+    logger.info(req.route);
     const cantidad = parseInt(req.params.num) || 100000000;
     const computo = fork("./computo.js");
     computo.send(cantidad);
     computo.on("message", (sum) => res.send(sum));
-    console.log("No bloqueante.");
 })
+
+app.use(function (req, res) {
+    loggerWarn.warn('404 - NOT FOUND')
+    res.sendStatus(404)
+});
 
 // handlebars engine
 app.engine(
@@ -159,8 +193,6 @@ function connect() {
 }
 
 io.on('connection', (socket) => {
-    console.log('Someone is connected');
-
     //funcion para leer todos los mensajes de la db y mostrarlos.
     function selectAllMessages() {
         Message.find().sort({
