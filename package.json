@@ -8,7 +8,9 @@
     "dev": "nodemon src/server.js --runMode=FORK --port=8080",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prod": "forever start -w src/server.js --runMode=CLUSTER --port=8080",
-    "pm2": "pm2 start ecosystem.config.js"
+    "pm2": "pm2 start ecosystem.config.js",
+    "artillery:fork": "artillery run artillery.yml",
+    "artillery:cluster": "artillery quick --count 5000 -n 40 http://localhost:8080/randoms/100000000"
   },
   "engines": {
     "node": ">=14.0.0",
